@@ -1,0 +1,5 @@
+name = Panels UUID
+description = Add UUID to the Paneles panes and displays
+core = 7.x
+dependencies[] = uuid
+dependencies[] = panels

@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * hook_schema_alter().
+ */
+function panels_uuid_schema_alter(&$schema) {
+  $field = uuid_schema_field_definition();
+  $schema['panels_display']['uuid'] = $field;
+  $schema['panels_pane']['uuid'] = $field;
+}
+
+/**
+ * Implements hook_install().
+ */
+function panels_uuid_install() {
+  $field = uuid_schema_field_definition();
+  db_add_field('panels_display', 'uuid', $field);
+  db_add_index('panels_display', 'uuid', array('uuid'));
+  db_add_field('panels_pane', 'uuid', $field);
+  db_add_index('panels_pane', 'uuid', array('uuid'));
+}
+
+/**
+ * Implements hook_enable().
+ */
+function panels_uuid_enable() {
+  uuid_sync_all();
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function panels_uuid_uninstall() {
+  db_drop_field('panels_pane', 'uuid');
+  db_drop_index('panels_pane', 'uuid');
+  db_drop_field('panels_display', 'uuid');
+  db_drop_index('panels_display', 'uuid');
+}

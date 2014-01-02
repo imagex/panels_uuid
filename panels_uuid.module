@@ -1,0 +1,54 @@
+<?php
+
+/**
+ * @file
+ * Implement UUID/Entity hooks for integrating with deploy and other modules.
+ */
+
+/**
+ * Implements hook_panels_display_save().
+ *
+ * @param $display
+ */
+function panels_uuid_panels_display_save($display) {
+  if (empty($display->uuid)) {
+    $display->uuid = uuid_generate();
+    drupal_write_record('panels_display', $display, array('did'));
+  }
+
+  foreach ($display->panes as $pane) {
+    if (empty($pane->uuid)) {
+      $pane->uuid = uuid_generate();
+      drupal_write_record('panels_pane', $pane, array('pid'));
+    }
+  }
+}
+
+/**
+ * Implements hook_uuid_sync().
+ */
+function panels_uuid_uuid_sync() {
+  $result = db_query("SELECT did, uuid FROM panels_display where UUID IS NULL or UUID = ''");
+
+  if ($result) {
+    while ($row = $result->fetchAssoc()) {
+      db_update('panels_display')
+        ->condition('did', $row['did'])
+        ->fields(array(
+          'uuid' => uuid_generate()
+        ))->execute();
+    }
+  }
+
+  $result = db_query("SELECT pid, uuid FROM panels_pane where UUID IS NULL or UUID = ''");
+
+  if ($result) {
+    while ($row = $result->fetchAssoc()) {
+      db_update('panels_pane')
+        ->condition('pid', $row['pid'])
+        ->fields(array(
+          'uuid' => uuid_generate()
+        ))->execute();
+    }
+  }
+}
