@@ -5,8 +5,8 @@
  */
 function panels_uuid_schema_alter(&$schema) {
   $field = uuid_schema_field_definition();
-  $schema['panels_display']['uuid'] = $field;
-  $schema['panels_pane']['uuid'] = $field;
+  $schema['panels_display']['fields']['uuid'] = $field;
+  $schema['panels_pane']['fields']['uuid'] = $field;
 }
 
 /**

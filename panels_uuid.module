@@ -13,13 +13,23 @@
 function panels_uuid_panels_display_save($display) {
   if (empty($display->uuid)) {
     $display->uuid = uuid_generate();
-    drupal_write_record('panels_display', $display, array('did'));
+    db_update("panels_display")
+      ->fields(array(
+        'uuid' => $display->uuid
+      ))
+      ->condition('did', $display->did)
+      ->execute();
   }
 
-  foreach ($display->panes as $pane) {
+  foreach ($display->content as &$pane) {
     if (empty($pane->uuid)) {
       $pane->uuid = uuid_generate();
-      drupal_write_record('panels_pane', $pane, array('pid'));
+      db_update("panels_pane")
+        ->fields(array(
+          'uuid' => $pane->uuid
+        ))
+        ->condition('pid', $pane->pid)
+        ->execute();
     }
   }
 }
