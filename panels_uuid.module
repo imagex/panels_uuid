@@ -67,50 +67,55 @@ function panels_uuid_uuid_sync() {
  * Covert a display's uuid to id
  */
 function panels_uuid_convert_display_to_uuid(&$displays) {
-  if (!is_array($displays)) {
-    $things = array(&$displays);
-  } else {
-    $things = &$displays;
-  }
-
-  $values = array();
-  foreach ($things as $display) {
-    $values[$display->did] = &$display->did;
-  }
-
-  $new_ids = panels_uuid_convert_helper($values, 'panels_display', 'did', 'uuid');
-
-  foreach ($new_ids as $id) {
-    $values[$id->did];
-  }
+  panels_uuid_convert_helper($displays, 'panels_display', 'did', 'uuid');
 }
 
 /**
  * Covert a display's uuid to id
  */
 function panels_uuid_convert_display_to_id(&$displays) {
-  if (!is_array($displays)) {
-    $things = array(&$displays);
+  panels_uuid_convert_helper($displays, 'panels_display', 'uuid', 'did');
+}
+
+/**
+ * Covert a display's uuid to id
+ */
+function panels_uuid_convert_pane_to_uuid(&$panes) {
+  panels_uuid_convert_helper($panes, 'panels_pane', 'pid', 'uuid');
+}
+
+/**
+ * Covert a display's uuid to id
+ */
+function panels_uuid_convert_pane_to_id(&$panes) {
+  panels_uuid_convert_helper($panes, 'panels_pane', 'uuid', 'pid');
+}
+
+/**
+ * @param $objects array
+ * @param $table string
+ * @param $from string
+ * @param $to string
+ */
+function panels_uuid_convert_helper(&$objects, $table, $from, $to) {
+  if (!is_array($objects)) {
+    $things = array(&$objects);
   } else {
-    $things = &$displays;
+    $things = &$objects;
   }
 
   $values = array();
-  foreach ($things as $display) {
-    $values[$display->did] = &$display->did;
+  foreach ($things as $thing) {
+    $values[$thing->$from] = &$thing->$from;
   }
 
-  $new_ids = panels_uuid_convert_helper($values, 'panels_display', 'uuid', 'did');
-
-  foreach ($new_ids as $id) {
-    $values[$id->did];
-  }
-}
-
-function panels_uuid_convert_helper($values, $table, $from, $to) {
-  return db_select($table, 't')
+  $new_ids = db_select($table, 't')
     ->fields('t', array($from, $to))
     ->condition($from, array_values($values), 'IN')
     ->execute()
     ->fetchAllKeyed();
+
+  foreach ($new_ids as $i => $value) {
+    $values[$i] = $new_ids[$i];
+  }
 }
