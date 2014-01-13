@@ -62,3 +62,55 @@ function panels_uuid_uuid_sync() {
     }
   }
 }
+
+/**
+ * Covert a display's uuid to id
+ */
+function panels_uuid_convert_display_to_uuid(&$displays) {
+  if (!is_array($displays)) {
+    $things = array(&$displays);
+  } else {
+    $things = &$displays;
+  }
+
+  $values = array();
+  foreach ($things as $display) {
+    $values[$display->did] = &$display->did;
+  }
+
+  $new_ids = panels_uuid_convert_helper($values, 'panels_display', 'did', 'uuid');
+
+  foreach ($new_ids as $id) {
+    $values[$id->did];
+  }
+}
+
+/**
+ * Covert a display's uuid to id
+ */
+function panels_uuid_convert_display_to_id(&$displays) {
+  if (!is_array($displays)) {
+    $things = array(&$displays);
+  } else {
+    $things = &$displays;
+  }
+
+  $values = array();
+  foreach ($things as $display) {
+    $values[$display->did] = &$display->did;
+  }
+
+  $new_ids = panels_uuid_convert_helper($values, 'panels_display', 'uuid', 'did');
+
+  foreach ($new_ids as $id) {
+    $values[$id->did];
+  }
+}
+
+function panels_uuid_convert_helper($values, $table, $from, $to) {
+  return db_select($table, 't')
+    ->fields('t', array($from, $to))
+    ->condition($from, array_values($values), 'IN')
+    ->execute()
+    ->fetchAllKeyed();
+}
