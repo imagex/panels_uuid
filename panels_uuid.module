@@ -104,18 +104,25 @@ function panels_uuid_convert_helper(&$objects, $table, $from, $to) {
     $things = &$objects;
   }
 
+  // track the references
   $values = array();
-  foreach ($things as $thing) {
-    $values[$thing->$from] = &$thing->$from;
+  // track the ids
+  $ids = array();
+  $i = 0;
+  foreach ($things as &$thing) {
+    $values[$i] = &$thing->$from;
+    $ids[] = $values[$i];
   }
 
   $new_ids = db_select($table, 't')
     ->fields('t', array($from, $to))
-    ->condition($from, array_values($values), 'IN')
+    ->condition($from, $ids, 'IN')
     ->execute()
     ->fetchAllKeyed();
 
-  foreach ($new_ids as $i => $value) {
-    $values[$i] = $new_ids[$i];
+  foreach ($values as $i => $value) {
+    if (isset($new_ids[$value])) {
+      $values[$i] = $new_ids[$value];
+    }
   }
 }
